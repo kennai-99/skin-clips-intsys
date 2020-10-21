@@ -89,12 +89,12 @@
 	(printout t crlf "Do you have bite or sting red? (yes|no)" crlf)
 	(assert (bite_red (read))))
 
-(defrule black_spot
+(defrule abnormal_skin
 	(infection_diagnosis)
         (bite_red no)
 	=>
-	(printout t crlf "Do you have tiny balck spots dotted on skin? (yes|no)" crlf)
-	(assert (black_spot (read))))
+	(printout t crlf "Do you have abnormal skin growth? (yes|no)" crlf)
+	(assert (abnormal_skin (read))))
 	
 	
 ;====LEVEL 2=================================================	
@@ -185,7 +185,6 @@
 	(fever_diagnosis)
 	(cold_cough yes)
         (sore_throat no)
-        (sudden_sore no)
 	=>
 	(printout t crlf "Do you have blister near mouth and lips? (yes|no)" crlf)
 	(assert (blister_mouth (read))))
@@ -194,25 +193,24 @@
 	(infection_diagnosis)
 	(bite_red yes)
 	=>
-	(printout t crlf "Do you have red spot itchy (yes|no)" crlf)
+	(printout t crlf "Do you have red spot itchy? (yes|no)" crlf)
 	(assert (red_spot_itchy (read))))
 
-(defrule wartz
+(defrule private_area
 	(infection_diagnosis)
-	(black_spot yes)
+	(abnormal_skin yes)
 	=>
-	(printout t crlf "Diagnosed as Wartz" crlf
-	"1. Restart the program "crlf
-	"2. Quit the program "crlf
-        "3. Medical advice "crlf
-	"Choice: ")
-	(bind ?response (read))
-		(if(= ?response 1) then (assert(start)))
-		else
-		(if(= ?response 2) then (assert(quits)))
-                else
-                (if(= ?response 3) then (printout t crlf "Most common warts go away without treatment, though it may take a year or two and new ones may develop nearby. It can be treated with different methods like salicylic acid, cryotherapy, other acids, minor surgery, and laser treatment" crlf))
-	(printout t crlf))
+	(printout t crlf "Do you have affected skin in a private area? (yes|no)" crlf)
+	(assert (private_area (read))))
+
+(defrule small_red
+	(infection_diagnosis)
+	(abnormal_skin no)
+	=>
+	(printout t crlf "Do you have small red bumps or tiny white blisters and ulcers? (yes|no)" crlf)
+	(assert (small_red (read))))
+
+
 
 ;====LEVEL 3/Result=================================================	
 	
@@ -278,12 +276,13 @@
 	(assert(red_eyes(read))))
 	
 
-(defrule swollen_tossil
+(defrule swollen_tonsil
 	(fever_diagnosis)
 	(sore_throat yes)
+	(red_eyes no)
 	=>
-	(printout t crlf "Do you have swollen tossil and flushed face? (yes|no)" crlf)
-	(assert(swollen_tossil(read))))
+	(printout t crlf "Do you have swollen tonsil and flushed face? (yes|no)" crlf)
+	(assert(swollen_tonsil(read))))
 
 (defrule cold_sore
 	(fever_diagnosis)
@@ -318,6 +317,47 @@
                 else
                 (if(= ?response 3) then (printout t crlf "Wash the affected area with soap and water. Apply a cold compress (such as a flannel or cloth cooled with cold water) or an ice pack to any swelling for at least 10 minutes. Raise or elevate the affected area if possible, as this can help reduce swelling." crlf))
 	(printout t crlf))
+
+(defrule genital_warts
+	(infection_diagnosis)
+	(private_area yes)
+	=>
+	(printout t crlf "Diagnosed as Genital Warts" crlf
+	"1. Restart the program "crlf
+	"2. Quit the program "crlf
+        "3. Medical advice "crlf
+	"Choice: ")
+	(bind ?response (read))
+		(if(= ?response 1) then (assert(start)))
+		else
+		(if(= ?response 2) then (assert(quits)))
+                else
+                (if(= ?response 3) then (printout t crlf "If your warts aren't causing discomfort, you might not need treatment. But if you have itching, burning and pain, or if you're concerned about spreading the infection, a doctor can help you clear an outbreak with medications or surgery." crlf))
+	(printout t crlf))
+
+(defrule common_warts
+	(infection_diagnosis)
+	(private_area no)
+	=>
+	(printout t crlf "Diagnosed as Common Warts" crlf
+	"1. Restart the program "crlf
+	"2. Quit the program "crlf
+        "3. Medical advice "crlf
+	"Choice: ")
+	(bind ?response (read))
+		(if(= ?response 1) then (assert(start)))
+		else
+		(if(= ?response 2) then (assert(quits)))
+                else
+                (if(= ?response 3) then (printout t crlf "Most common warts go away without treatment, though it may take a year or two and new ones may develop nearby. It can be treated with different methods like salicylic acid, cryotherapy, other acids, minor surgery, and laser treatment" crlf))
+	(printout t crlf))
+
+(defrule swollen_gland
+	(infection_diagnosis)
+	(small_red yes)
+	=>
+	(printout t crlf "Do you have swollen gland? (yes|no)" crlf)
+	(assert (swollen_gland (read))))
 	
 ;====LEVEL 4===================================================
 
@@ -342,7 +382,7 @@
 (defrule scarlet_fever
 	(fever_diagnosis)
 	(sore_throat yes)
-	(swollen_tossil yes)
+	(swollen_tonsil yes)
 	=>
 	(printout t crlf "Diagnosed as Scarlet Fever" crlf
 	"1. Restart the program "crlf
@@ -357,21 +397,40 @@
                 (if(= ?response 3) then (printout t crlf "It can easily be treated with antibiotics. Liquid antibiotics, such as penicillin or amoxicillin, are often used to treat children. These must be taken for 10 days, even though most people recover after four to five days." crlf))
 	(printout t crlf))
 
-;====No Result=================================================
-
-(defrule no_result_1
-	(pain_touch no)
-	(white_silvery no)
-	(small_blister no)
+(defrule herpes
+	(infection_diagnosis)
+	(small_red yes)
+	(swollen_gland yes)
 	=>
-	(printout t crlf "Condition is not in knowledge base, please seek further help from experts" crlf
+	(printout t crlf "Diagnosed as Herpes" crlf
 	"1. Restart the program "crlf
 	"2. Quit the program "crlf
+        "3. Medical advice "crlf
 	"Choice: ")
 	(bind ?response (read))
 		(if(= ?response 1) then (assert(start)))
 		else
 		(if(= ?response 2) then (assert(quits)))
+                else
+                (if(= ?response 3) then (printout t crlf "No drug can get rid of the herpes virus. However, a doctor may prescribe an antiviral medication, such as acyclovir, to prevent the virus from multiplying." crlf))
+	(printout t crlf))
+
+;====No Result=================================================
+
+(defrule no_result_1
+	(small_blister no)
+	=>
+	(printout t crlf "Condition is not in knowledge base, please seek further help from experts" crlf
+	"1. Restart the program "crlf
+	"2. Quit the program "crlf
+        "3. Medical advice "crlf
+	"Choice: ")
+	(bind ?response (read))
+		(if(= ?response 1) then (assert(start)))
+		else
+		(if(= ?response 2) then (assert(quits)))
+                else
+                (if(= ?response 3) then (printout t crlf "Use antiviral creams as soon as you recognise the early tingling feeling. They do not always work after blisters appear." crlf))
 	(printout t crlf))
 
 (defrule no_result_2
@@ -380,11 +439,14 @@
 	(printout t crlf "Condition is not in knowledge base, please seek further help from experts" crlf
 	"1. Restart the program "crlf
 	"2. Quit the program "crlf
+        "3. Medical advice "crlf
 	"Choice: ")
 	(bind ?response (read))
 		(if(= ?response 1) then (assert(start)))
 		else
 		(if(= ?response 2) then (assert(quits)))
+                else
+                (if(= ?response 3) then (printout t crlf "Wash the affected area with soap and water. Apply a cold compress (such as a flannel or cloth cooled with cold water) or an ice pack to any swelling for at least 10 minutes. Raise or elevate the affected area if possible, as this can help reduce swelling." crlf))
 	(printout t crlf))
 
 (defrule no_result_3
@@ -399,34 +461,8 @@
 		else
 		(if(= ?response 2) then (assert(quits)))
 	(printout t crlf))
-	
+
 (defrule no_result_4
-	(blister-mouth no)
-	=>
-	(printout t crlf "Condition is not in knowledge base, please seek further help from experts" crlf
-	"1. Restart the program "crlf
-	"2. Quit the program "crlf
-	"Choice: ")
-	(bind ?response (read))
-		(if(= ?response 1) then (assert(start)))
-		else
-		(if(= ?response 2) then (assert(quits)))
-	(printout t crlf))
-
-(defrule no_result_5
-	(black_spot no)
-	=>
-	(printout t crlf "Condition is not in knowledge base, please seek further help from experts" crlf
-	"1. Restart the program "crlf
-	"2. Quit the program "crlf
-	"Choice: ")
-	(bind ?response (read))
-		(if(= ?response 1) then (assert(start)))
-		else
-		(if(= ?response 2) then (assert(quits)))
-	(printout t crlf))
-
-(defrule no_result_6
 	(red_spot_itchy no)
 	=>
 	(printout t crlf "Condition is not in knowledge base, please seek further help from experts" crlf
@@ -439,8 +475,34 @@
 		(if(= ?response 2) then (assert(quits)))
 	(printout t crlf))
 	
+(defrule no_result_5
+	(swollen_tonsil no)
+	=>
+	(printout t crlf "Condition is not in knowledge base, please seek further help from experts" crlf
+	"1. Restart the program "crlf
+	"2. Quit the program "crlf
+	"Choice: ")
+	(bind ?response (read))
+		(if(= ?response 1) then (assert(start)))
+		else
+		(if(= ?response 2) then (assert(quits)))
+	(printout t crlf))
+
+(defrule no_result_6
+	(small_red no)
+	=>
+	(printout t crlf "Condition is not in knowledge base, please seek further help from experts" crlf
+	"1. Restart the program "crlf
+	"2. Quit the program "crlf
+	"Choice: ")
+	(bind ?response (read))
+		(if(= ?response 1) then (assert(start)))
+		else
+		(if(= ?response 2) then (assert(quits)))
+	(printout t crlf))
+
 (defrule no_result_7
-	(swollen_tossil no)
+	(swollen_gland no)
 	=>
 	(printout t crlf "Condition is not in knowledge base, please seek further help from experts" crlf
 	"1. Restart the program "crlf
